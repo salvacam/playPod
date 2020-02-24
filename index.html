@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lector de Podcast</title>
+    <link rel="stylesheet" href="css/marketing.css">
+    <script src="js/zepto.min.js"></script>
+    <script src="js/main.js"></script>
+</head>
+
+<body>
+    <div class="header">
+        <div class="home-menu pure-menu pure-menu-open pure-menu-horizontal pure-menu-fixed">
+            <span class="pure-menu-heading">Lector Podcast</span>
+        </div>
+    </div>
+
+    <div class="content-wrapper">
+        <div class="content">
+            <h3 class="content-head is-center">Podcast</h3>
+        <!--
+            <button id="panico" class="pure-button dest" data-destino="http://feeds.feedburner.com/panicoenelnucleo-podcast" data-nombre="Panico en el Nucleo">Panico en el Núcleo</button>
+            <button id="cerveza" class="pure-button dest" data-destino="http://feeds.feedburner.com/cervezagratis/MP3" data-nombre="Cerveza Gratis">Cerveza Gratis</button>
+        -->
+            <button id="rico" class="pure-button dest" data-destino="http://www.spreaker.com/show/2877494/episodes/feed" data-nombre="Cerveza Gratis">Rico</button>
+
+            <br/>
+            <form class="pure-form">
+                <fieldset>
+                    <legend>Otro RSS</legend>
+                    <input id="otro-txt" type="text" placeholder="RSS" value="">
+                    <button id="otro-bt" class="pure-button">Buscar</button>
+                </fieldset>
+            </form>
+
+            <div class="pure-g">
+                <hr/>
+                <div id="audioDiv" class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
+                    <button id='atras' class='pure-button none botones'>&lt;</button>
+                    <button id='adelante' class='pure-button none botones'>&gt;</button>
+                    <br/><audio controls id="audio">
+                    </audio>
+                </div>
+                <hr/>
+                <div class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
+                    <div id="listado">
+                        Elige tu podcast favorito o introduce rss
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
