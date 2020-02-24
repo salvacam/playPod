@@ -42,7 +42,10 @@ $(function () {
                 pos = 0;
 				$("#listado").text("");
 				$("#listado").append("<h3>" + nombre + "</h3>");
-				if (data.length > 0) {                    
+				if (data.length > 0) {
+
+                	console.log(data);
+                	data.reverse();                    
                     $(".botones").removeClass("none");
                     $(".botones").addClass("visto");
 					for (var i = 0; i < data.length; i++) {
