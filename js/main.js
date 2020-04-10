@@ -33,7 +33,8 @@ $(function () {
     function buscar(url, nombre) {
 		$.ajax({
 			type: 'GET',
-			url: "https://calcicolous-moonlig.000webhostapp.com/podcast/index.php?url=" + encodeURI(url),
+			//url: "https://calcicolous-moonlig.000webhostapp.com/podcast/index.php?url=" + encodeURI(url),
+			url: "https://playpod.herokuapp.com/index.php?url=" + encodeURI(url),
 			//url: "servidor/index.php?url=" + encodeURI(url),
 			dataType: 'json',
 			success: function(data){
