@@ -46,7 +46,7 @@ $(function () {
 				if (data.length > 0) {
 
                 	console.log(data);
-                	data.reverse();                    
+                	//data.reverse();                    
                     $(".botones").removeClass("none");
                     $(".botones").addClass("visto");
 					for (var i = 0; i < data.length; i++) {
