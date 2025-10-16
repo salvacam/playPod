@@ -1,11 +1,17 @@
-const CACHE_NAME = 'playPod-v0.0.1';
+const CACHE_NAME = 'playPod-v0.1.0';
 const FILES_TO_CACHE = [
   './',
   './index.html',
   '/js/main.js',
   '/js/zepto.min.js',
+  '/img/delete.png',
+  '/img/download.png',
+  '/img/edit.png',
   '/img/github.png',
-  '/img/icon.png'
+  '/img/icon.png',
+  '/img/menu.png',
+  '/img/plus.png',
+  '/img/upload.png'
 ];
 
 // Instalación: cacheamos los archivos base
