@@ -26,6 +26,10 @@ $(function () {
 		}
 	});
     
+	$("#darkMode").on("change", function () {
+		$("body").toggleClass("dark");
+	});
+    
     function play(cadena, titleAudio, min) {
         $("#audio").attr("src", cadena);
         $("#audio").attr("autoplay", "");
@@ -51,6 +55,7 @@ $(function () {
 			//url: "servidor/index.php?url=" + encodeURI(url),
 			dataType: 'json',
 			success: function(data) {
+        		$("#feedsList").removeAttr("open");
         		$("#spinnerDiv").addClass("hide");
                 //console.log(data);
 				$("#listado").append("<h3>" + nombre + "</h3>");
@@ -94,4 +99,30 @@ $(function () {
 	});
 
     setInterval(myTimer, 30000);
+
+
+	function actualizarAvisoConexion() {
+	  const aviso = document.getElementById('offline-warning');
+	  if (navigator.onLine) {
+	    aviso.style.display = 'none';
+		$("#container").removeClass("hide");
+	  } else {
+	    aviso.style.display = 'block';
+	    $("#container").addClass("hide");
+	  }
+	}
+
+	// Detecta cambios de conexión
+	window.addEventListener('online', actualizarAvisoConexion);
+	window.addEventListener('offline', actualizarAvisoConexion);
+
+	// Ejecuta al cargar la página
+	actualizarAvisoConexion();
+
+	if ('serviceWorker' in navigator) {
+	  navigator.serviceWorker.register('/sw.js')
+	    .then(() => console.log('Service Worker registrado'))
+	    .catch(err => console.error('SW fallo:', err));
+	}
+
 });

@@ -1,7 +1,20 @@
 <?php
-// proxy-dynamic-feeds.php - Proxy con URLs dinámicas y caché
-header('Content-Type: application/json; charset=utf-8');
+/* 
+$allowed_origin = 'https://salvacam.js.org';
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+
+if ($origin !== $allowed_origin) {
+    http_response_code(403);
+    echo json_encode(['error' => 'Origen no permitido']);
+    exit;
+}
+
+header("Access-Control-Allow-Origin: $allowed_origin");
+*/
 header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+header('Content-Type: application/json; charset=utf-8');
 
 
 // Función para formatear la duración
@@ -68,7 +81,7 @@ function formatDuration($durationStr) {
 }
 
 // Configuración
-$cacheTime = 8 * 60 * 60; // 8 horas
+$cacheTime = 12 * 60 * 60; // 12 horas
 $cacheDir = 'cache/feeds/';
 
 // Obtener la URL del feed desde el parámetro
