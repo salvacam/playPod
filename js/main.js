@@ -9,7 +9,7 @@ $(function () {
         if ($("#otro-txt").val() == "") {
             $("#listado").text("Introduce url donde buscar archivos mp3");
         } else {
-            buscar($("#otro-txt").val(), limpiaUrl($("#otro-txt").val()));
+            buscar($("#otro-txt").val(), $("#otro-txt").val() );
             $("#otro-txt").val("");
         }
     });
@@ -25,11 +25,6 @@ $(function () {
 			}	
 		}
 	});
-    
-    function limpiaUrl(cadena) {
-        var pos = cadena.lastIndexOf("/");
-        return cadena.substring(pos + 1);
-    }
     
     function play(cadena, titleAudio, min) {
         $("#audio").attr("src", cadena);
@@ -57,9 +52,7 @@ $(function () {
                 //console.log(data);
 				$("#listado").text("");
 				$("#listado").append("<h3>" + nombre + "</h3>");
-				if (data.length > 0) {
-                	//console.log(data);
-                	//data.reverse();                    
+				if (data.length > 0) {              
                     $(".botones").removeClass("none");
                     $(".botones").addClass("visto");
 					for (var i = 0; i < data.length; i++) {
