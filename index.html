@@ -5,51 +5,84 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lector de Podcast</title>
-    <link rel="stylesheet" href="css/marketing.css">
+    <style type="text/css">
+        /* Copyright 2014 Owen Versteeg; MIT licensed */body,textarea,input,select{background:0;border-radius:0;font:16px sans-serif;margin:0}.smooth{transition:all .2s}.btn,.nav a{text-decoration:none}.container{margin:0 20px;width:auto}label>*{display:inline}form>*{display:block;margin-bottom:10px}.btn{background:#999;border-radius:6px;border:0;color:#fff;cursor:pointer;display:inline-block;margin:2px 0;padding:12px 30px 14px}.btn:hover{background:#888}.btn:active,.btn:focus{background:#777}.btn-a{background:#0ae}.btn-a:hover{background:#09d}.btn-a:active,.btn-a:focus{background:#08b}.btn-b{background:#3c5}.btn-b:hover{background:#2b4}.btn-b:active,.btn-b:focus{background:#2a4}.btn-c{background:#d33}.btn-c:hover{background:#c22}.btn-c:active,.btn-c:focus{background:#b22}.btn-sm{border-radius:4px;padding:10px 14px 11px}.row{margin:1% 0;overflow:auto}.col{float:left}.table,.c12{width:100%}.c11{width:91.66%}.c10{width:83.33%}.c9{width:75%}.c8{width:66.66%}.c7{width:58.33%}.c6{width:50%}.c5{width:41.66%}.c4{width:33.33%}.c3{width:25%}.c2{width:16.66%}.c1{width:8.33%}h1{font-size:3em}.btn,h2{font-size:2em}.ico{font:33px Arial Unicode MS,Lucida Sans Unicode}.addon,.btn-sm,.nav,textarea,input,select{outline:0;font-size:14px}textarea,input,select{padding:8px;border:1px solid #ccc}textarea:focus,input:focus,select:focus{border-color:#5ab}textarea,input[type=text]{-webkit-appearance:none;width:13em}.addon{padding:8px 12px;box-shadow:0 0 0 1px #ccc}.nav,.nav .current,.nav a:hover{background:#000;color:#fff}.nav{height:24px;padding:11px 0 15px}.nav a{color:#aaa;padding-right:1em;position:relative;top:-1px}.nav .pagename{font-size:22px;top:1px}.btn.btn-close{background:#000;float:right;font-size:25px;margin:-54px 7px;display:none}@media(min-width:1310px){.container{margin:auto;width:1270px}}@media(max-width:350px){.row .col{width:100%}}@media(max-width:500px){.btn.btn-close{display:block}.nav{overflow:hidden}.pagename{margin-top:-11px}.nav:active,.nav:focus{height:auto}.nav div:before{background:#000;border-bottom:10px double;border-top:3px solid;content:'';float:right;height:4px;position:relative;right:3px;top:14px;width:20px}.nav a{padding:.5em 0;display:block;width:50%}}.table th,.table td{padding:.5em;text-align:left}.table tbody>:nth-child(2n-1){background:#ddd}.msg{padding:1.5em;background:#def;border-left:5px solid #59d}
+
+        .btn {color:black;background: #e6e6e6;}
+        .text-center{text-align: center;}
+        .text-right{text-align: right;}
+        h3 {margin: 5px;}
+
+        .home-menu{padding:.5em;text-align:left;box-shadow:0 1px 1px rgba(0,0,0,0.10)}
+        .home-menu.pure-menu-open{background:#2d3e50}
+        .pure-menu.pure-menu-open.pure-menu-fixed{border-bottom:none;z-index:4}
+        .home-menu .pure-menu-heading{color:#fff;font-weight:400;font-size:120%}
+        .home-menu .pure-menu-selected a{color:#fff}
+        .home-menu a{color:#6FBEF3}
+        .home-menu li a:hover,.home-menu li a:focus{background:none;border:none;color:#AECFE5}
+        .content{padding:25px;padding-top:50px}
+        .pure-button{margin-bottom:5px}
+        .pure-button.pista{margin-bottom:15px}
+        #listado li{list-style-type:none}
+        #listado{margin:0;padding:0}
+        .none{display:none}
+        .visto{display:inline}
+    </style>
     <script src="js/zepto.min.js"></script>
     <script src="js/main.js"></script>
 </head>
 
 <body>
-    <div class="header">
-        <div class="home-menu pure-menu pure-menu-open pure-menu-horizontal pure-menu-fixed">
-            <span class="pure-menu-heading">Lector Podcast</span>
+
+    <div class="container">        
+        <div class="" style="display:flex;align-items:center;justify-content:space-between;">
+            <div><h3 class="content-head is-center">PlayPod</h3></div>
+            <div><a href="https://github.com/salvacam/playPod" title="GitHub" target="_blank" rel="noopener"><img src="./github.png" alt="GitHub" height="25"></a></div>
         </div>
-    </div>
 
-    <div class="content-wrapper">
-        <div class="content">
-            <h3 class="content-head is-center">Podcast</h3>
-        <!--
-            <button id="panico" class="pure-button dest" data-destino="http://feeds.feedburner.com/panicoenelnucleo-podcast" data-nombre="Panico en el Nucleo">Panico en el Núcleo</button>
-            <button id="cerveza" class="pure-button dest" data-destino="http://feeds.feedburner.com/cervezagratis/MP3" data-nombre="Cerveza Gratis">Cerveza Gratis</button>
-        -->
-            <button id="rico" class="pure-button dest" data-destino="http://www.spreaker.com/show/2877494/episodes/feed" data-nombre="Cerveza Gratis">Rico</button>
-
-            <button id="spectrum" class="pure-button dest" data-destino="https://www.ivoox.com/feed_fg_f141937_filtro_1.xml" data-nombre="spectrum">El mundo del spectrum</button>
-
-            <br/>
-            <form class="pure-form">
-                <fieldset>
-                    <legend>Otro RSS</legend>
-                    <input id="otro-txt" type="text" placeholder="RSS" value="">
-                    <button id="otro-bt" class="pure-button">Buscar</button>
-                </fieldset>
-            </form>
-
-            <div class="pure-g">
-                <hr/>
+        <div class="row">            
+            <div class="col c12">
                 <div id="audioDiv" class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
-                    <button id='atras' class='pure-button none botones'>&lt;</button>
-                    <button id='adelante' class='pure-button none botones'>&gt;</button>
-                    <br/><audio controls id="audio" style="width: 90%">
-                    </audio>
+                    <br/>
+                    <button id="play" class="btn btn-sm smooth" style="height: 75px; width: 75px;">Pause</button>
+                    <br/>
+                    <audio controls id="audio" style="width:100%"></audio>
                 </div>
+            </div>
+
+            <div class="col c12">
                 <hr/>
+                    <button id='playLast' class='btn btn-sm smooth' data-mp3="" data-podcast="" data-min="">Reanudar audio</button>
+                    <br/>
+                    <span id="lastPodcast"></span> - <span id="lastTime"></span> min.
+            </div>
+
+            <div class="col c12">
+                <hr/>
+                <button class="btn btn-sm smooth dest" data-destino="https://api.rtve.es/api/programas/46690/audios.rss" data-nombre="Fallo de sistema">Fallo de sistema</button>
+
+                <button class="btn btn-sm smooth dest" data-destino="https://rigorycriterio.es/feeds/audio_teleindiscretos.rss.xml" data-nombre="Teleindiscretos">Teleindiscretos</button>
+
+                <button class="btn btn-sm smooth dest" data-destino="https://msdos.club/podfeed/feed.xml" data-nombre="MS Dos club">MS Dos club</button>
+
+                <button class="btn btn-sm smooth dest" data-destino="https://fitnessrevolucionario.com/feed/podcast" data-nombre="Radio Fitness Revolucionario">Radio Fitness Revolucionario</button>
+
+                <button class="btn btn-sm smooth dest" data-destino="https://www.ivoox.com/feed_fg_f1302670_filtro_1.xml" data-nombre="Construye tu Físico">Construye tu Físico</button>
+                <hr/>
+
                 <div class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
                     <div id="listado">
                         Elige tu podcast favorito o introduce rss
                     </div>
+                </div>
+                <div class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
+                    <form class="pure-form">
+                        <fieldset>
+                            <legend>Otro RSS</legend>
+                            <input id="otro-txt" type="text" class="smooth" placeholder="RSS" value="">
+                            <button id="otro-bt" class="pure-button">Buscar</button>
+                        </fieldset>
+                    </form>
                 </div>
             </div>
         </div>

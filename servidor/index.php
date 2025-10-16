@@ -1,58 +1,194 @@
 <?php
-//header('Content-Type: application/json');
-header('Content-Type: text/plain');
-header("access-control-allow-origin: *");
-/*
-if (isset($_POST["url"])) { 
-    $url = $_POST["url"];*/
-if (isset($_GET["url"])) { 
-    $url = $_GET["url"];
-    /*
-    $c = curl_init();
-    curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($c, CURLOPT_URL, $url);
-    $page = curl_exec($c);
-    curl_close($c);
-    */
-    $page = file_get_contents($url);
+// proxy-dynamic-feeds.php - Proxy con URLs dinámicas y caché
+header('Content-Type: application/json; charset=utf-8');
+header('Access-Control-Allow-Origin: *');
 
-    if ($page) {
-      //  var_dump($page);
-        $array = array();
-        //$posinicial = strpos($page, 'href');
-        $posinicial = strpos($page, '<enclosure url="');
-        //$posfinal = strpos($page, "\"", $posinicial + 6);
-        $posfinal = strpos($page, "\" length", $posinicial);
-        while ($posinicial) {
-            //$aux = substr($page, $posinicial + 6, $posfinal - ($posinicial + 6));
-            $aux = substr($page, $posinicial + 16, $posfinal - ($posinicial + 16));            
-            $array[] = $aux;
-            //if (substr($aux, strlen($aux) - 4) == ".mp3") {
-            if (substr($aux, strlen($aux) - 4) == "http://ivoox") {
-                $array[] = $aux;
-            }
 
-            //$posinicial = strpos($page, 'href', $posinicial + 6);
-            //$posfinal = strpos($page, "\"", $posinicial + 6);
-
-        $posinicial = strpos($page, '<enclosure url="', $posinicial + 10);
-        //$posfinal = strpos($page, "\"", $posinicial + 6);
-        $posfinal = strpos($page, "\" length", $posinicial);
-        }
-        $salida = '[';
-        foreach ($array as $key => $value) {
-            $salida .= '{"r": "' . $value . '"},';
-            //$salida .= $value ;
-        }
-        $salida = substr($salida, 0, -1);
-        if ($salida !== "["){
-            echo $salida . ']';   // hay mp3 devuelve array con las url     
-        } else {
-            echo '{"r":0}'; // ningun mp3         
-        }
-    } else {
-        echo '{"r":-2}'; // parametro no es una url
+// Función para formatear la duración
+function formatDuration($durationStr) {
+    if (empty($durationStr)) {
+        return '';
     }
-} else {
-    echo '{"r":-1}'; // no hay parametro
+
+    // Si es un número, asumimos que son segundos
+    if (is_numeric($durationStr)) {
+        $seconds = intval($durationStr);
+        $hours = floor($seconds / 3600);
+        $minutes = floor(($seconds % 3600) / 60);
+        $seconds = $seconds % 60;
+        if ($hours > 0) {
+            return sprintf("%02d:%02d:%02d", $hours, $minutes, $seconds);
+        } else {
+            return sprintf("%02d:%02d", $minutes, $seconds);
+        }
+    }
+
+    // Si contiene dos puntos, puede ser HH:MM:SS o MM:SS
+    if (strpos($durationStr, ':') !== false) {
+        $parts = explode(':', $durationStr);
+        $numParts = count($parts);
+        if ($numParts === 2) {
+            // MM:SS
+            $minutes = intval($parts[0]);
+            $seconds = intval($parts[1]);
+            $hours = 0;
+            if ($minutes >= 60) {
+                $hours = floor($minutes / 60);
+                $minutes = $minutes % 60;
+                return sprintf("%02d:%02d:%02d", $hours, $minutes, $seconds);
+            } else {
+                return sprintf("%02d:%02d", $minutes, $seconds);
+            }
+        } else if ($numParts === 3) {
+            // HH:MM:SS
+            if (strpos($parts[0], '.') !== false) {
+                // Caso especial: horas decimales (como "1.8666666666666667:00:00")
+                $hoursDecimal = floatval($parts[0]);
+                $hours = floor($hoursDecimal);
+                $minutes = round(($hoursDecimal - $hours) * 60);
+                $seconds = intval($parts[2]);
+                // Aseguramos que los minutos no excedan 59
+                if ($minutes >= 60) {
+                    $hours += floor($minutes / 60);
+                    $minutes = $minutes % 60;
+                }
+                return sprintf("%02d:%02d:%02d", $hours, $minutes, $seconds);
+            } else {
+                // Formato normal HH:MM:SS
+                $hours = intval($parts[0]);
+                $minutes = intval($parts[1]);
+                $seconds = intval($parts[2]);
+                return sprintf("%02d:%02d:%02d", $hours, $minutes, $seconds);
+            }
+        }
+    }
+
+    // Si no coincide con ningún formato, devolvemos la cadena original
+    return $durationStr;
 }
+
+// Configuración
+$cacheTime = 8 * 60 * 60; // 8 horas
+$cacheDir = 'cache/feeds/';
+
+// Obtener la URL del feed desde el parámetro
+if (!isset($_GET['url']) || empty($_GET['url'])) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Parámetro "url" requerido']);
+    exit;
+}
+
+$targetUrl = $_GET['url'];
+
+// Validar URL
+if (!filter_var($targetUrl, FILTER_VALIDATE_URL)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'URL no válida']);
+    exit;
+}
+
+// Crear nombre de archivo de caché seguro
+$cacheFile = $cacheDir . 'feed_' . md5($targetUrl) . '.json';
+
+// Crear directorio de caché si no existe
+if (!is_dir($cacheDir)) {
+    mkdir($cacheDir, 0755, true);
+}
+
+// Verificar caché
+if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < $cacheTime) {
+    $cachedData = json_decode(file_get_contents($cacheFile), true);
+    $cachedData['cached'] = true;
+    echo json_encode($cachedData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    exit;
+}
+
+// Obtener datos frescos
+$ch = curl_init();
+curl_setopt_array($ch, [
+    CURLOPT_URL => $targetUrl,
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_FOLLOWLOCATION => true,
+    CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+    CURLOPT_TIMEOUT => 30,
+    CURLOPT_SSL_VERIFYPEER => true, // Mejor para producción
+    CURLOPT_SSL_VERIFYHOST => 2
+]);
+
+$response = curl_exec($ch);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+if (curl_error($ch) || !$response || $httpCode !== 200) {
+    // Si hay error pero existe caché, usar caché aunque esté expirado
+    if (file_exists($cacheFile)) {
+        $cachedData = json_decode(file_get_contents($cacheFile), true);
+        $cachedData['cached'] = true;
+        $cachedData['error'] = 'Usando caché por error: ' . curl_error($ch);
+        echo json_encode($cachedData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        curl_close($ch);
+        exit;
+    }
+    
+    http_response_code(500);
+    echo json_encode([
+        'error' => 'No se pudo obtener el feed',
+        'curlError' => curl_error($ch),
+        'httpCode' => $httpCode
+    ]);
+    curl_close($ch);
+    exit;
+}
+
+curl_close($ch);
+
+// Parsear XML y extraer datos
+$xml = simplexml_load_string($response);
+$episodes = [];
+
+if ($xml) {
+    $channelTitle = (string)$xml->channel->title;
+    $channelDescription = (string)$xml->channel->description;
+    
+    foreach ($xml->channel->item as $item) {
+        if (isset($item->enclosure)) {
+            $url = (string)$item->enclosure['url'];
+            // Buscar cualquier archivo de audio, no solo MP3
+            if (preg_match('/\.(mp3|m4a|wav|ogg|aac)$/i', $url)) {
+                $pubDate = (string)$item->pubDate;
+                $timestamp = strtotime($pubDate);
+                
+                $episodes[] = [
+                    'title' => (string)$item->title,
+                    'url' => $url,
+                    'date' => $pubDate,
+                    'timestamp' => $timestamp,
+                    'dateReadable' => date('d/m/Y H:i', $timestamp),
+                    'duration' => formatDuration((string)$item->children('itunes', true)->duration),
+                ];
+            }
+        }
+    }
+}
+
+// Ordenar por fecha (más nuevos primero)
+usort($episodes, function($a, $b) {
+    return $b['timestamp'] - $a['timestamp'];
+});
+
+// Preparar respuesta
+$result = [
+    'success' => true,
+    'feedUrl' => $targetUrl,
+    'title' => $channelTitle ?? '',
+    'count' => count($episodes),
+    'episodes' => $episodes,
+    'lastUpdated' => date('d/m/Y H:i'),
+    'cached' => false
+];
+
+// Guardar en caché
+file_put_contents($cacheFile, json_encode($episodes, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+
+// Enviar respuesta
+echo json_encode($episodes, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+?>

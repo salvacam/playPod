@@ -1,8 +1,8 @@
 $(function () {
-    var lista;
     $(".dest").on("click", function () {
         buscar($(this).data("destino"), $(this).data("nombre"));
     });
+
     $("#otro-bt").on("click", function (e) {
         e.preventDefault();
         console.log($("#otro-txt").val());
@@ -13,72 +13,89 @@ $(function () {
             $("#otro-txt").val("");
         }
     });
+
+	$("#play").on("click", function (x) {
+		if ($('audio')[0].src != '') {
+			if($('audio')[0].paused) {
+				$('audio')[0].play();
+				$("#play").html("Pause");
+			} else {
+				$('audio')[0].pause();
+				$("#play").html("Play");
+			}	
+		}
+	});
+    
     function limpiaUrl(cadena) {
         var pos = cadena.lastIndexOf("/");
         return cadena.substring(pos + 1);
     }
-    function play(cadena, pos) {
+    
+    function play(cadena, titleAudio, min) {
         $("#audio").attr("src", cadena);
         $("#audio").attr("autoplay", "");
-        $("#audio").on("ended", function () {
-            if (pos < lista.length - 1) {
-                play(lista[pos + 1].r, pos + 1);
-            } else {
-                play(lista[0].r, 0);
-            }
-        });
+		$("#audio")[0].currentTime = min;
+		$("#audio")[0].title = titleAudio;
         $("#titulo").remove();
-        $("#audioDiv").prepend("<span data-pos='" + pos + "' id='titulo'>" + limpiaUrl(cadena) + "</span>");
+        $("#audioDiv").prepend("<span id='titulo'>" + titleAudio + "</span>");
+        localStorage.setItem("_playpod_mp3", cadena);
+    	$("#playLast")[0].dataset.mp3 = localStorage.getItem("_playpod_mp3");
+        localStorage.setItem("_playpod_title", titleAudio);
+    	$("#lastPodcast").html(localStorage.getItem("_playpod_title"));
+    	localStorage.setItem("_playpod_time", min);    	
+    	$("#lastTime").html(parseInt(parseInt($("#audio")[0].currentTime)/60));
+    	window.scrollTo(0, 0);
     }
+
     function buscar(url, nombre) {
 		$.ajax({
 			type: 'GET',
-			//url: "https://calcicolous-moonlig.000webhostapp.com/podcast/index.php?url=" + encodeURI(url),
-			url: "https://playpod.herokuapp.com/index.php?url=" + encodeURI(url),
+			url: "https://salvacam.x10.mx/playPod/index.php?url=" + encodeURI(url),
 			//url: "servidor/index.php?url=" + encodeURI(url),
 			dataType: 'json',
 			success: function(data){
-				lista = data;
-                console.log(data);
-                pos = 0;
+                //console.log(data);
 				$("#listado").text("");
 				$("#listado").append("<h3>" + nombre + "</h3>");
 				if (data.length > 0) {
-
-                	console.log(data);
+                	//console.log(data);
                 	//data.reverse();                    
                     $(".botones").removeClass("none");
                     $(".botones").addClass("visto");
 					for (var i = 0; i < data.length; i++) {
-						$("#listado").append("<button class='pure-button pista' data-pista='" + i + "'>" + limpiaUrl(data[i].r) + "</button><br/>");
+						$("#listado").append("<button class='btn btn-sm smooth pista' data-pista='" + i + "'>" + data[i].title + " " + data[i].duration + "</button><br/>");
 					}
-					play(data[0].r, 0);
+					
 					$(".pista").on("click", function () {
-						play(data[$(this).data("pista")].r, $(this).data("pista"));
-					});
-					$("#atras").on("click", function () {
-						var pos = $("#titulo").data("pos");
-						if (pos > 0) {
-							play(data[pos - 1].r, pos - 1);
-						} else {
-							play(data[data.length - 1].r, data.length - 1);
-						}
-					});
-					$("#adelante").on("click", function () {
-						var pos = $("#titulo").data("pos");
-						if (pos < data.length - 1) {
-							play(data[pos + 1].r, pos + 1);
-						} else {
-							play(data[0].r, 0);
-						}
+						play(data[$(this).data("pista")].url, data[$(this).data("pista")].title,0);
 					});
 				} else {
-					$("#listado").append("<h5>No hay mp3</h5>");
+					$("#listado").append("<h5>No hay audios</h5>");
 				}
 			},
 			error: function(xhr, type){
-				$("#listado").append("<h5>No hay mp3</h5>");
+				$("#listado").append("<h5>No hay audios</h5>");
 			}
 		});
     }
+
+    $("#playLast")[0].dataset.mp3 = localStorage.getItem("_playpod_mp3");
+    $("#lastPodcast").html(localStorage.getItem("_playpod_title"));
+    $("#playLast")[0].dataset.podcast = localStorage.getItem("_playpod_title");
+	$("#lastTime").html(parseInt(localStorage.getItem("_playpod_time")/60));
+	$("#playLast")[0].dataset.min = localStorage.getItem("_playpod_time");
+	
+	function myTimer() {
+		if ($("#audio")[0].duration > 0) {
+			localStorage.setItem("_playpod_time", parseInt($("#audio")[0].currentTime));
+    		$("#lastTime").html(parseInt(localStorage.getItem("_playpod_time")/60));
+    		$("#playLast")[0].dataset.min = localStorage.getItem("_playpod_time");
+		}
+  	}
+
+	$("#playLast").on("click", function (x) {
+		play(x.target.dataset.mp3, x.target.dataset.podcast,x.target.dataset.min);
+	});
+
+    setInterval(myTimer, 30000);
 });
