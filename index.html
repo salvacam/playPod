@@ -12,6 +12,16 @@
         .text-center{text-align: center;}
         .text-right{text-align: right;}
         h3 {margin: 5px;}
+        
+        .header {
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            background:#2d3e50;
+            color:white;    
+            padding-left: 10px;
+            padding-right: 10px;
+        }
 
         .home-menu{padding:.5em;text-align:left;box-shadow:0 1px 1px rgba(0,0,0,0.10)}
         .home-menu.pure-menu-open{background:#2d3e50}
@@ -34,12 +44,12 @@
 
 <body>
 
-    <div class="container">        
-        <div class="" style="display:flex;align-items:center;justify-content:space-between;">
-            <div><h3 class="content-head is-center">PlayPod</h3></div>
-            <div><a href="https://github.com/salvacam/playPod" title="GitHub" target="_blank" rel="noopener"><img src="./github.png" alt="GitHub" height="25"></a></div>
-        </div>
+    <div class="header">
+        <div><h3 class="content-head is-center">PlayPod</h3></div>
+        <div><a href="https://github.com/salvacam/playPod" title="GitHub" target="_blank" rel="noopener"><img src="./github.png" alt="GitHub" height="25"></a></div>
+    </div>
 
+    <div class="container">        
         <div class="row">            
             <div class="col c12">
                 <div id="audioDiv" class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
