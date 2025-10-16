@@ -43,14 +43,16 @@ $(function () {
     }
 
     function buscar(url, nombre) {
+        $("#spinnerDiv").removeClass("hide");
+		$("#listado").text("");
 		$.ajax({
 			type: 'GET',
 			url: "https://salvacam.x10.mx/playPod/index.php?url=" + encodeURI(url),
 			//url: "servidor/index.php?url=" + encodeURI(url),
 			dataType: 'json',
-			success: function(data){
+			success: function(data) {
+        		$("#spinnerDiv").addClass("hide");
                 //console.log(data);
-				$("#listado").text("");
 				$("#listado").append("<h3>" + nombre + "</h3>");
 				if (data.length > 0) {              
                     $(".botones").removeClass("none");
@@ -66,7 +68,8 @@ $(function () {
 					$("#listado").append("<h5>No hay audios</h5>");
 				}
 			},
-			error: function(xhr, type){
+			error: function(xhr, type) {
+        		$("#spinnerDiv").addClass("hide");
 				$("#listado").append("<h5>No hay audios</h5>");
 			}
 		});

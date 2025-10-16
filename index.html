@@ -23,6 +23,13 @@
             padding-left: 10px;
             padding-right: 10px;
         }
+        .justify-center { display:flex; align-items:center; justify-content: center;   }
+        /************ Spinner ************/
+        @keyframes spinner {to {transform: rotate(360deg);}}
+
+        .spinner:before {content: '';box-sizing: border-box;display: block;top:50%;left:50%;width:50px;height:50px;border-radius:50%;border:2px solid #ccc;border-top-color: #333;animation:spinner .6s linear infinite;}
+
+        .hide{display:none !important;}
     </style>
     <script src="js/zepto.min.js"></script>
     <script src="js/main.js"></script>
@@ -69,6 +76,9 @@
                 <div class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
                     <div id="listado">
                         Elige tu podcast favorito o introduce rss
+                    </div>
+                    <div class="justify-center">
+                        <div class="spinner hide" id="spinnerDiv"></div>
                     </div>
                 </div>
                 <div class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
