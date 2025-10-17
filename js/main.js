@@ -1,5 +1,41 @@
 $(function () {
 
+	var episodios =  JSON.parse(localStorage.getItem("_playpod_episodios"));
+	var escuchados =  JSON.parse(localStorage.getItem("_playpod_escuchados"));
+	if (escuchados == null) {
+		escuchados = [];
+	}
+	var comprobarOidos = [];
+	if (episodios == null){
+		episodios = [ 
+			{
+				url: "https://api.rtve.es/api/programas/46690/audios.rss",
+				name: "Fallo de sistema"
+			},
+			{
+				url: "https://rigorycriterio.es/feeds/audio_teleindiscretos.rss.xml",
+				name: "Teleindiscretos"
+			},
+			{
+				url: "https://msdos.club/podfeed/feed.xml",
+				name: "MS Dos club"
+			},
+			{
+				url: "https://www.ivoox.com/feed_fg_f141937_filtro_1.xml",
+				name: "El Mundo del Spectrum"
+			},
+			{
+				url: "https://fitnessrevolucionario.com/feed/podcast",
+				name: "Radio Fitness"
+			},
+			{
+				url: "https://www.ivoox.com/feed_fg_f1302670_filtro_1.xml",
+				name: "Construye tu Físico"
+			}
+		];
+	}
+	var paginacion = 0;
+
     $("#otro-bt").on("click", function (e) {
         if ($("#otro-txt").val() == "" || $("#otro-name").val() == "") {
 			customAlert("Introduce nombre y rss");
@@ -15,7 +51,7 @@ $(function () {
 	    if (customConfirm("¿Estás seguro de que eliminar el episodio?")) {
 	    	episodios.splice(id, 1);
 			localStorage.setItem("_playpod_episodios", JSON.stringify(episodios));
-			actualizarProgramas();		
+			actualizarProgramas();
 			$('#config').scrollTop(0);
 		}
     }
@@ -93,7 +129,7 @@ $(function () {
 		URL.revokeObjectURL(url);
     });
 
-	$("#play").on("click", function (x) {
+	$("#play").on("click", function () {
 		if ($('audio')[0].src != '') {
 			if($('audio')[0].paused) {
 				$('audio')[0].play();
@@ -115,7 +151,7 @@ $(function () {
     	$('body').toggleClass('noscroll');
     });
 
-    function play(cadena, titleAudio, min) {
+    function play(cadena, titleAudio, min, guid) {
         $("#audio").attr("src", cadena);
         $("#audio").attr("autoplay", "");
 		$("#audio")[0].currentTime = min;
@@ -128,42 +164,15 @@ $(function () {
     	$("#lastPodcast").html(localStorage.getItem("_playpod_title"));
     	localStorage.setItem("_playpod_time", min);    	
     	$("#lastTime").html(parseInt(parseInt($("#audio")[0].currentTime)/60));
-    	window.scrollTo(0, 0);
-    }
 
-    function buscar(url, nombre) {
-        $("#spinnerDiv").removeClass("hide");
-		$("#listado").text("");
-		$.ajax({
-			type: 'GET',
-			url: "https://salvacam.x10.mx/playPod/index.php?url=" + encodeURI(url),
-			//url: "servidor/index.php?url=" + encodeURI(url),
-			dataType: 'json',
-			success: function(data) {
-        		$("#feedsList").removeAttr("open");        		
-        		$("#episodioList").prop('open', true);;
-        		$("#spinnerDiv").addClass("hide");
-                //console.log(data);
-				$("#listado").append("<h3 class='text-center'>" + nombre + "</h3>");
-				if (data.length > 0) {              
-                    $(".botones").removeClass("none");
-                    $(".botones").addClass("visto");
-					for (var i = 0; i < data.length; i++) {
-						$("#listado").append("<button class='btn btn-sm smooth pista' data-pista='" + i + "'>" + data[i].title + " " + data[i].duration + "</button><br/>");
-					}
-					
-					$(".pista").on("click", function () {
-						play(data[$(this).data("pista")].url, data[$(this).data("pista")].title,0);
-					});
-				} else {
-					$("#listado").append("<h5>No hay audios</h5>");
-				}
-			},
-			error: function(xhr, type) {
-        		$("#spinnerDiv").addClass("hide");
-				$("#listado").append("<h5>No hay audios</h5>");
-			}
-		});
+    	if (escuchados == null) {
+    		escuchados = [];    		
+    	}
+		if (guid != "" && escuchados.indexOf(guid) === -1) {
+    		escuchados.push(guid);
+			localStorage.setItem("_playpod_escuchados", JSON.stringify(escuchados));
+		}
+    	window.scrollTo(0, 0);
     }
 
     $("#playLast")[0].dataset.mp3 = localStorage.getItem("_playpod_mp3");
@@ -187,7 +196,13 @@ $(function () {
   	}
 
 	$("#playLast").on("click", function (x) {
-		play(x.target.dataset.mp3, x.target.dataset.podcast,x.target.dataset.min);
+		play(x.target.dataset.mp3, x.target.dataset.podcast,x.target.dataset.min, '');
+	});
+
+	$("#oidoTodos").on("click", function (x) {
+		escuchados = comprobarOidos;
+		localStorage.setItem("_playpod_escuchados", JSON.stringify(escuchados));		
+		$('.oir').removeClass('oir');
 	});
 
     setInterval(myTimer, 30000);
@@ -211,14 +226,11 @@ $(function () {
 	// Ejecuta al cargar la página
 	actualizarAvisoConexion();
 
+
+
 	function actualizarProgramas() {
-		$("#botonesDest").text("");
 		$("#programasConfig").text("");
 		for (var i = 0; i < episodios.length; i++) {
-			$("#botonesDest").append(" <button class='btn btn-sm smooth dest' data-destino='" 
-				+ episodios[i].url + "' data-nombre='" + episodios[i].name 
-				+ "''>" + episodios[i].name + "</button> ");
-
 			$("#programasConfig").append(" <div><input data-id='" + i + "' name='nombre' type='text' class='smooth inputConfig' value='" 
 				+ episodios[i].name + "'></div><br>" 
 				+ "<div><input data-id='" + i + "' name='url' type='text' class='smooth inputConfig' value='"  
@@ -230,10 +242,6 @@ $(function () {
 	            + "<img src='./img/delete.png' alt='Editar' width='30'></button></div><br>");
 		}
 
-		$(".dest").on("click", function () {
-	        buscar($(this).data("destino"), $(this).data("nombre"));
-	    });
-
 		$(".deleteE").on("click", function () {
 	        deleteEpisodio($(this).data("id"));
 	    });
@@ -241,38 +249,113 @@ $(function () {
 		$(".editE").on("click", function () {
 	        editEpisodio($(this).data("id"));
 	    });
+		$("#listado").text("");
+		paginacion = 0;
+	    cargarEpisodios();
 	}
 
-	var episodios =  JSON.parse(localStorage.getItem("_playpod_episodios"));
-	if (episodios == null){
-		episodios = [ 
-			{
-				url: "https://api.rtve.es/api/programas/46690/audios.rss",
-				name: "Fallo de sistema"
-			},
-			{
-				url: "https://rigorycriterio.es/feeds/audio_teleindiscretos.rss.xml",
-				name: "Teleindiscretos"
-			},
-			{
-				url: "https://msdos.club/podfeed/feed.xml",
-				name: "MS Dos club"
-			},
-			{
-				url: "https://www.ivoox.com/feed_fg_f141937_filtro_1.xml",
-				name: "El Mundo del Spectrum"
-			},
-			{
-				url: "https://fitnessrevolucionario.com/feed/podcast",
-				name: "Radio Fitness"
-			},
-			{
-				url: "https://www.ivoox.com/feed_fg_f1302670_filtro_1.xml",
-				name: "Construye tu Físico"
-			}
-		];
-	}
 	actualizarProgramas();
+
+	function cargarEpisodios() {
+        $("#spinnerDiv").removeClass("hide");
+		const datos = {
+		  pag: paginacion,
+		  prog: episodios 
+		};
+		$.ajax({
+			type: 'POST',
+			url: "https://salvacam.x10.mx/playPod/mix.php",
+			//url: "servidor/mix.php",
+		  	data: { 
+			    pag: paginacion, 
+			    prog: JSON.stringify(episodios)
+			},
+			dataType: 'json',
+			success: function(data) {
+        		$("#spinnerDiv").addClass("hide");
+				/*
+				duration: "52:29"
+				name:"Radio Fitness"
+				title:"Ayudar Mejor y Peligros de la Empatía, con Pablo Melchor"
+				url:"https://traffic.libsyn.com/fitnessrevolucionario/Episodio457.mp3"
+				*/
+    			if (data.length > 0) {              
+					for (var i = 0; i < data.length; i++) {
+
+	                    var nombrePista = data[i].title + " <i>{ " + data[i].name +  " }</i> ";
+	                    var nombrePistaMostrar = data[i].title + " <i>{ " + data[i].name +  " }</i> " + data[i].duration;
+	                    var escuchado = "";
+	                    if (data[i].guid != "") {
+	                    	comprobarOidos.push(data[i].guid);
+							if (escuchados.indexOf(data[i].guid) === -1) {					    		
+	                    		escuchado = "oir";
+							}
+	                    }
+						$("#listado").append("<div class='justify-between'><div style='width:90%'>"
+							+"<button class='btn btn-sm smooth pista " + escuchado + "' data-pista='" + i 
+							+ "' data-nombre='" + nombrePista + "' data-url='" + data[i].url 
+							+ "' data-guid='" + data[i].guid  +"'> "
+							+ nombrePistaMostrar + "</button></div>"
+							+ " <div><button class='btn btn-sm smooth marcarOido " + escuchado + "' style='padding:5px;'>"
+							+ " <img src='./img/headphones.png' alt='Marcar como oid' width='30'"
+							+ " data-guid='" + data[i].guid  +"'></button> </div></div>");
+					}
+
+
+					$(".marcarOido").on("click", function (x) {
+				    	if (escuchados == null) {
+				    		escuchados = [];    		
+				    	} 	
+						$(x.target).removeClass('oir');
+						$(x.target).parent().removeClass('oir');
+    					$('.pista.oir[data-guid="' + x.target.dataset.guid + '"]').removeClass('oir');
+						if (escuchados.indexOf(x.target.dataset.guid) === -1) {
+    						escuchados.push(x.target.dataset.guid);
+							localStorage.setItem("_playpod_escuchados", JSON.stringify(escuchados));
+						}
+					});
+					
+					$(".pista").on("click", function (x) {
+						$(x.target).removeClass('oir');
+						play(x.target.dataset.url, x.target.dataset.nombre, 0, x.target.dataset.guid);
+					});
+
+					//console.log(comprobarOidos);
+					//console.log(escuchados);
+					escuchados = escuchados.filter(item => comprobarOidos.includes(item));
+					localStorage.setItem("_playpod_escuchados", JSON.stringify(escuchados));
+				}
+			},
+			error: function(xhr, type) {
+        		$("#spinnerDiv").addClass("hide");
+				$("#listado").append("<h5>No hay audios</h5>");
+			}
+		});
+		paginacion++;
+	}
+
+	var isLoading = 0;
+
+	$(window).on('scroll', function() {
+	  const scrollTop = $(window).scrollTop();
+	  const windowHeight = $(window).height();
+	  const documentHeight = $(document).height();
+
+	  if (scrollTop + windowHeight >= documentHeight - 50) {
+	    if (isLoading == 0) {
+	      isLoading = 1;
+	      cargarMas();
+	      setTimeout(() => isLoading = 0, 500);
+	    }
+	  }
+	});
+
+	function cargarMas() {
+		const details = document.getElementById('episodioList');
+		if (details.open && !$('#config').hasClass('show') ) {
+		    cargarEpisodios();
+		}
+	}
 
 	function customAlert(message) {
 	    return new Promise(function(resolve) {
@@ -308,7 +391,7 @@ $(function () {
 	}
 	
 	if ('serviceWorker' in navigator) {
-	  navigator.serviceWorker.register('/sw.js')
+	  navigator.serviceWorker.register('./sw.js')
 	    .then(() => console.log('Service Worker registrado'))
 	    .catch(err => console.error('SW fallo:', err));
 	}

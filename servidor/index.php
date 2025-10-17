@@ -81,8 +81,9 @@ function formatDuration($durationStr) {
 }
 
 // Configuración
-$cacheTime = 12 * 60 * 60; // 12 horas
+$cacheTime = 18 * 60 * 60; // 18 horas
 $cacheDir = 'cache/feeds/';
+$perPage = 5;
 
 // Obtener la URL del feed desde el parámetro
 if (!isset($_GET['url']) || empty($_GET['url'])) {
@@ -100,6 +101,10 @@ if (!filter_var($targetUrl, FILTER_VALIDATE_URL)) {
     exit;
 }
 
+// Parámetro opcional de paginación
+$page = isset($_GET['pag']) ? intval($_GET['pag']) : null;
+if ($page !== null && $page < 0) $page = 0;
+
 // Crear nombre de archivo de caché seguro
 $cacheFile = $cacheDir . 'feed_' . md5($targetUrl) . '.json';
 
@@ -111,7 +116,14 @@ if (!is_dir($cacheDir)) {
 // Verificar caché
 if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < $cacheTime) {
     $cachedData = json_decode(file_get_contents($cacheFile), true);
-    $cachedData['cached'] = true;
+    
+    // aplicar paginación solo a la salida, no al archivo
+    if ($page !== null) {
+        $start = $page * $perPage;
+        $pagedEpisodes = array_slice($cachedData, $start, $perPage);
+        echo json_encode($pagedEpisodes, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
     echo json_encode($cachedData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     exit;
 }
@@ -173,6 +185,7 @@ if ($xml) {
                 $episodes[] = [
                     'title' => (string)$item->title,
                     'url' => $url,
+                    'guid' => (string)$item->guid,
                     'date' => $pubDate,
                     'timestamp' => $timestamp,
                     'dateReadable' => date('d/m/Y H:i', $timestamp),
@@ -188,19 +201,18 @@ usort($episodes, function($a, $b) {
     return $b['timestamp'] - $a['timestamp'];
 });
 
-// Preparar respuesta
-$result = [
-    'success' => true,
-    'feedUrl' => $targetUrl,
-    'title' => $channelTitle ?? '',
-    'count' => count($episodes),
-    'episodes' => $episodes,
-    'lastUpdated' => date('d/m/Y H:i'),
-    'cached' => false
-];
-
 // Guardar en caché
 file_put_contents($cacheFile, json_encode($episodes, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+
+
+// Aplicar paginación si corresponde
+if ($page !== null) {
+    $start = $page * $perPage;
+    $pagedEpisodes = array_slice($episodes, $start, $perPage);
+    // Enviar respuesta
+    echo json_encode($pagedEpisodes, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    exit;
+}
 
 // Enviar respuesta
 echo json_encode($episodes, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
