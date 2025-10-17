@@ -146,7 +146,9 @@ $(function () {
 			},
 			dataType: 'json',
 			success: function(data) {
-				comprobarOidos = [];
+				if (paginacion == 0) {
+					comprobarOidos = [];
+				}
         		$("#spinnerDiv").addClass("hide");
 				/*
 				duration: "52:29"
