@@ -98,9 +98,11 @@ $(function () {
         localStorage.setItem("_playpod_mp3", cadena);
     	$("#playLast")[0].dataset.mp3 = localStorage.getItem("_playpod_mp3");
         localStorage.setItem("_playpod_title", titleAudio);
+    	$("#playLast")[0].dataset.podcast = localStorage.getItem("_playpod_title");
     	$("#lastPodcast").html(localStorage.getItem("_playpod_title"));
     	localStorage.setItem("_playpod_time", min);    	
     	$("#lastTime").html(parseInt(parseInt($("#audio")[0].currentTime)/60));
+		$("#playLast")[0].dataset.min = localStorage.getItem("_playpod_time");
 
     	if (escuchados == null) {
     		escuchados = [];    		
