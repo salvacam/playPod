@@ -36,16 +36,7 @@ $(function () {
 	}
 	var paginacion = 0;
 
-    $("#otro-bt").on("click", function (e) {
-        if ($("#otro-txt").val() == "" || $("#otro-name").val() == "") {
-			customAlert("Introduce nombre y rss");
-        } else {
-			episodios.push({url: $("#otro-txt").val(),
-				name: $("#otro-name").val()});
-			localStorage.setItem("_playpod_episodios", JSON.stringify(episodios));
-			actualizarProgramas();
-		}
-    });
+	var isLoading = 0;
 
     function deleteEpisodio(id) {    	
 	    if (customConfirm("¿Estás seguro de que eliminar el episodio?")) {
@@ -69,164 +60,6 @@ $(function () {
 			$('#config').scrollTop(0);
     	}
     }
-
-	$('#jsonFile').on('change', function(e) {
-	    var archivo = e.target.files[0];
-	    if (!archivo) return;
-
-	    var lector = new FileReader();
-	    lector.onload = function(e) {
-	        try {
-	            var datos = JSON.parse(e.target.result);
-
-	            if (!Array.isArray(datos)) {
-	                throw new Error("El JSON no es un array");
-	            }
-
-	            var valido = datos.every(item => 
-	                typeof item === 'object' &&
-	                item !== null &&
-	                'url' in item &&
-	                'name' in item
-	            );
-
-	            if (!valido) {
-	                throw new Error("Cada elemento debe ser un objeto con 'url' y 'name'");
-	            }
-    
-			    if (customConfirm("¿Estás seguro de que guardar la lista subida?")) {			     
-					episodios = datos;
-					localStorage.setItem("_playpod_episodios", JSON.stringify(episodios));
-					actualizarProgramas();
-					$('#config').scrollTop(0);
-				}
-	        } catch(err) {
-	            customAlert("Archivo JSON inválido: " + err.message);
-	        }
-	    };
-
-	    lector.readAsText(archivo);
-	});
-
-	
-	$('#uploadEpisodios').on('click', function() {
-   	 $('#jsonFile').click(); // simula clic en el input oculto
-	});
-
-    $("#downloadEpisodios").on("click", function (e) {
-		var json = JSON.stringify(episodios, null, 2);
-
-		var blob = new Blob([json], { type: "application/json" });
-
-		var url = URL.createObjectURL(blob);
-		var a = $('<a>')
-		  .attr('href', url)
-		  .attr('download', 'plapPod.json')  
-		  .appendTo('body');
-
-		a[0].click(); 
-		a.remove();   
-		URL.revokeObjectURL(url);
-    });
-
-	$("#play").on("click", function () {
-		if ($('audio')[0].src != '') {
-			if($('audio')[0].paused) {
-				$('audio')[0].play();
-				$("#play").html("Pause");
-			} else {
-				$('audio')[0].pause();
-				$("#play").html("Play");
-			}	
-		}
-	});
-    
-	$("#darkMode").on("change", function () {
-		$("body").toggleClass("dark");
-        localStorage.setItem("_playpod_dark", $('#darkMode').is(':checked'));
-	});
-    
-    $('#configToggle').on('click', function() {
-        $('#config').toggleClass('show');
-    	$('body').toggleClass('noscroll');
-    });
-
-    function play(cadena, titleAudio, min, guid) {
-        $("#audio").attr("src", cadena);
-        $("#audio").attr("autoplay", "");
-		$("#audio")[0].currentTime = min;
-		$("#audio")[0].title = titleAudio;
-        $("#titulo").remove();
-        $("#audioDiv").prepend("<span id='titulo'>" + titleAudio + "</span>");
-        localStorage.setItem("_playpod_mp3", cadena);
-    	$("#playLast")[0].dataset.mp3 = localStorage.getItem("_playpod_mp3");
-        localStorage.setItem("_playpod_title", titleAudio);
-    	$("#lastPodcast").html(localStorage.getItem("_playpod_title"));
-    	localStorage.setItem("_playpod_time", min);    	
-    	$("#lastTime").html(parseInt(parseInt($("#audio")[0].currentTime)/60));
-
-    	if (escuchados == null) {
-    		escuchados = [];    		
-    	}
-		if (guid != "" && escuchados.indexOf(guid) === -1) {
-    		escuchados.push(guid);
-			localStorage.setItem("_playpod_escuchados", JSON.stringify(escuchados));
-		}
-    	window.scrollTo(0, 0);
-    }
-
-    $("#playLast")[0].dataset.mp3 = localStorage.getItem("_playpod_mp3");
-    $("#lastPodcast").html(localStorage.getItem("_playpod_title"));
-    $("#playLast")[0].dataset.podcast = localStorage.getItem("_playpod_title");
-	$("#lastTime").html(parseInt(localStorage.getItem("_playpod_time")/60));
-	$("#playLast")[0].dataset.min = localStorage.getItem("_playpod_time");
-	
-	var darkMode = localStorage.getItem("_playpod_dark");
-	if (darkMode != null && darkMode == "true") {
-		$('#darkMode').prop('checked', true);		
-		$("body").toggleClass("dark");
-	}
-	
-	function myTimer() {
-		if ($("#audio")[0].duration > 0) {
-			localStorage.setItem("_playpod_time", parseInt($("#audio")[0].currentTime));
-    		$("#lastTime").html(parseInt(localStorage.getItem("_playpod_time")/60));
-    		$("#playLast")[0].dataset.min = localStorage.getItem("_playpod_time");
-		}
-  	}
-
-	$("#playLast").on("click", function (x) {
-		play(x.target.dataset.mp3, x.target.dataset.podcast,x.target.dataset.min, '');
-	});
-
-	$("#oidoTodos").on("click", function (x) {
-		escuchados = comprobarOidos;
-		localStorage.setItem("_playpod_escuchados", JSON.stringify(escuchados));		
-		$('.oir').removeClass('oir');
-	});
-
-    setInterval(myTimer, 30000);
-
-
-	function actualizarAvisoConexion() {
-	  const aviso = document.getElementById('offline-warning');
-	  if (navigator.onLine) {
-	    aviso.style.display = 'none';
-		$("#container").removeClass("hide");
-	  } else {
-	    aviso.style.display = 'block';
-	    $("#container").addClass("hide");
-	  }
-	}
-
-	// Detecta cambios de conexión
-	window.addEventListener('online', actualizarAvisoConexion);
-	window.addEventListener('offline', actualizarAvisoConexion);
-
-	// Ejecuta al cargar la página
-	actualizarAvisoConexion();
-
-
 
 	function actualizarProgramas() {
 		$("#programasConfig").text("");
@@ -254,7 +87,48 @@ $(function () {
 	    cargarEpisodios();
 	}
 
-	actualizarProgramas();
+    function play(cadena, titleAudio, min, guid) {
+        $("#audio").attr("src", cadena);
+        $("#audio").attr("autoplay", "");
+		$("#audio")[0].currentTime = min;
+		$("#audio")[0].title = titleAudio;
+        $("#titulo").remove();
+        $("#audioDiv").prepend("<span id='titulo'>" + titleAudio + "</span>");
+        localStorage.setItem("_playpod_mp3", cadena);
+    	$("#playLast")[0].dataset.mp3 = localStorage.getItem("_playpod_mp3");
+        localStorage.setItem("_playpod_title", titleAudio);
+    	$("#lastPodcast").html(localStorage.getItem("_playpod_title"));
+    	localStorage.setItem("_playpod_time", min);    	
+    	$("#lastTime").html(parseInt(parseInt($("#audio")[0].currentTime)/60));
+
+    	if (escuchados == null) {
+    		escuchados = [];    		
+    	}
+		if (guid != "" && escuchados.indexOf(guid) === -1) {
+    		escuchados.push(guid);
+			localStorage.setItem("_playpod_escuchados", JSON.stringify(escuchados));
+		}
+    	window.scrollTo(0, 0);
+    }
+    
+	function myTimer() {
+		if ($("#audio")[0].duration > 0) {
+			localStorage.setItem("_playpod_time", parseInt($("#audio")[0].currentTime));
+    		$("#lastTime").html(parseInt(localStorage.getItem("_playpod_time")/60));
+    		$("#playLast")[0].dataset.min = localStorage.getItem("_playpod_time");
+		}
+  	}
+
+	function actualizarAvisoConexion() {
+	  const aviso = document.getElementById('offline-warning');
+	  if (navigator.onLine) {
+	    aviso.style.display = 'none';
+		$("#container").removeClass("hide");
+	  } else {
+	    aviso.style.display = 'block';
+	    $("#container").addClass("hide");
+	  }
+	}
 
 	function cargarEpisodios() {
         $("#spinnerDiv").removeClass("hide");
@@ -272,6 +146,7 @@ $(function () {
 			},
 			dataType: 'json',
 			success: function(data) {
+				comprobarOidos = [];
         		$("#spinnerDiv").addClass("hide");
 				/*
 				duration: "52:29"
@@ -320,8 +195,6 @@ $(function () {
 						play(x.target.dataset.url, x.target.dataset.nombre, 0, x.target.dataset.guid);
 					});
 
-					//console.log(comprobarOidos);
-					//console.log(escuchados);
 					escuchados = escuchados.filter(item => comprobarOidos.includes(item));
 					localStorage.setItem("_playpod_escuchados", JSON.stringify(escuchados));
 				}
@@ -333,22 +206,6 @@ $(function () {
 		});
 		paginacion++;
 	}
-
-	var isLoading = 0;
-
-	$(window).on('scroll', function() {
-	  const scrollTop = $(window).scrollTop();
-	  const windowHeight = $(window).height();
-	  const documentHeight = $(document).height();
-
-	  if (scrollTop + windowHeight >= documentHeight - 50) {
-	    if (isLoading == 0) {
-	      isLoading = 1;
-	      cargarMas();
-	      setTimeout(() => isLoading = 0, 500);
-	    }
-	  }
-	});
 
 	function cargarMas() {
 		const details = document.getElementById('episodioList');
@@ -389,7 +246,151 @@ $(function () {
 	        });
 	    });
 	}
+
+	$(window).on('scroll', function() {
+	  const scrollTop = $(window).scrollTop();
+	  const windowHeight = $(window).height();
+	  const documentHeight = $(document).height();
+
+	  if (scrollTop + windowHeight >= documentHeight - 50) {
+	    if (isLoading == 0) {
+	      isLoading = 1;
+	      cargarMas();
+	      setTimeout(() => isLoading = 0, 500);
+	    }
+	  }
+	});
+
+    $('#configToggle').on('click', function() {
+        $('#config').toggleClass('show');
+    	$('body').toggleClass('noscroll');
+    });
+
+	$("#darkMode").on("change", function () {
+		$("body").toggleClass("dark");
+        localStorage.setItem("_playpod_dark", $('#darkMode').is(':checked'));
+	});
+
+	$("#resetOidos").on("click", function () {
+		escuchados = [];
+		localStorage.setItem("_playpod_escuchados", JSON.stringify(escuchados));
+		$("#listado").text("");
+		paginacion = 0;
+	    cargarEpisodios();
+	});
+
+    $("#otro-bt").on("click", function (e) {
+        if ($("#otro-txt").val() == "" || $("#otro-name").val() == "") {
+			customAlert("Introduce nombre y rss");
+        } else {
+			episodios.push({url: $("#otro-txt").val(),
+				name: $("#otro-name").val()});
+			localStorage.setItem("_playpod_episodios", JSON.stringify(episodios));
+			actualizarProgramas();
+		}
+    });
+
+	$('#jsonFile').on('change', function(e) {
+	    var archivo = e.target.files[0];
+	    if (!archivo) return;
+
+	    var lector = new FileReader();
+	    lector.onload = function(e) {
+	        try {
+	            var datos = JSON.parse(e.target.result);
+
+	            if (!Array.isArray(datos)) {
+	                throw new Error("El JSON no es un array");
+	            }
+
+	            var valido = datos.every(item => 
+	                typeof item === 'object' &&
+	                item !== null &&
+	                'url' in item &&
+	                'name' in item
+	            );
+
+	            if (!valido) {
+	                throw new Error("Cada elemento debe ser un objeto con 'url' y 'name'");
+	            }
+    
+			    if (customConfirm("¿Estás seguro de que guardar la lista subida?")) {			     
+					episodios = datos;
+					localStorage.setItem("_playpod_episodios", JSON.stringify(episodios));
+					actualizarProgramas();
+					$('#config').scrollTop(0);
+				}
+	        } catch(err) {
+	            customAlert("Archivo JSON inválido: " + err.message);
+	        }
+	    };
+
+	    lector.readAsText(archivo);
+	});
 	
+	$('#uploadEpisodios').on('click', function() {
+   	 $('#jsonFile').click(); // simula clic en el input oculto
+	});
+
+    $("#downloadEpisodios").on("click", function (e) {
+		var json = JSON.stringify(episodios, null, 2);
+
+		var blob = new Blob([json], { type: "application/json" });
+
+		var url = URL.createObjectURL(blob);
+		var a = $('<a>')
+		  .attr('href', url)
+		  .attr('download', 'plapPod.json')  
+		  .appendTo('body');
+
+		a[0].click(); 
+		a.remove();   
+		URL.revokeObjectURL(url);
+    });
+
+	$("#play").on("click", function () {
+		if ($('audio')[0].src != '') {
+			if($('audio')[0].paused) {
+				$('audio')[0].play();
+				$("#play").html("Pause");
+			} else {
+				$('audio')[0].pause();
+				$("#play").html("Play");
+			}	
+		}
+	});
+
+	$("#playLast").on("click", function (x) {
+		play(x.target.dataset.mp3, x.target.dataset.podcast,x.target.dataset.min, '');
+	});
+
+	$("#oidoTodos").on("click", function (x) {
+		escuchados = comprobarOidos;
+		localStorage.setItem("_playpod_escuchados", JSON.stringify(escuchados));		
+		$('.oir').removeClass('oir');
+	});
+
+	window.addEventListener('online', actualizarAvisoConexion);
+	window.addEventListener('offline', actualizarAvisoConexion);
+ 
+    $("#playLast")[0].dataset.mp3 = localStorage.getItem("_playpod_mp3");
+    $("#lastPodcast").html(localStorage.getItem("_playpod_title"));
+    $("#playLast")[0].dataset.podcast = localStorage.getItem("_playpod_title");
+	$("#lastTime").html(parseInt(localStorage.getItem("_playpod_time")/60));
+	$("#playLast")[0].dataset.min = localStorage.getItem("_playpod_time");
+	
+	var darkMode = localStorage.getItem("_playpod_dark");
+	if (darkMode != null && darkMode == "true") {
+		$('#darkMode').prop('checked', true);		
+		$("body").toggleClass("dark");
+	}
+
+	actualizarAvisoConexion();
+
+    setInterval(myTimer, 30000);
+
+	actualizarProgramas();
+
 	if ('serviceWorker' in navigator) {
 	  navigator.serviceWorker.register('./sw.js')
 	    .then(() => console.log('Service Worker registrado'))
