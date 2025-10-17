@@ -1,5 +1,6 @@
-const CACHE_NAME = 'playPod-v0.1.23';
-const FILES_TO_CACHE = [
+var cacheName = 'playPod-v0.1.23';
+
+var filesToCache = [
   './',
   './index.html',
   '/js/main.js',
@@ -15,19 +16,29 @@ const FILES_TO_CACHE = [
   '/img/upload.png'
 ];
 
-// Instalación: cacheamos los archivos base
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(FILES_TO_CACHE))
+self.addEventListener('install', function(e) {
+  console.log('[ServiceWorker] Install_');
+  e.waitUntil(
+    caches.open(cacheName).then(function(cache) {
+      console.log('[ServiceWorker] Caching app shell');
+      return cache.addAll(filesToCache);
+    })
   );
 });
 
-// Activación: limpieza de versiones antiguas
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.map((key) => key !== CACHE_NAME && caches.delete(key)))
-    )
+self.addEventListener('activate', function(e) {
+  console.log('[ServiceWorker] Activate_');
+  e.waitUntil(
+    caches.keys().then(function(keyList) {
+      return Promise.all(keyList.map(function(key) {
+        if (key.startsWith('tiempo-')){
+          if (key !== cacheName) {
+            console.log('[ServiceWorker] Removing old cache', key);
+            return caches.delete(key);
+          }
+        }
+      }));
+    })
   );
 });
 
@@ -38,19 +49,3 @@ self.addEventListener('fetch', function(event) {
     })
   );
 });
-
-/*
-// Interceptar peticiones
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    fetch(event.request)
-      .then((response) => {
-        // Actualiza el caché con la nueva versión
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
-        return response;
-      })
-      .catch(() => caches.match(event.request)) // Si no hay red → usa caché
-  );
-});
-*/
