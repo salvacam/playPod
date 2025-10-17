@@ -1,4 +1,4 @@
-const CACHE_NAME = 'playPod-v0.1.2';
+const CACHE_NAME = 'playPod-v0.1.21';
 const FILES_TO_CACHE = [
   './',
   './index.html',
