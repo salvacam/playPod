@@ -1,4 +1,4 @@
-var cacheName = 'playPod-v0.1.23';
+var cacheName = 'playPod-v0.1.24';
 
 var filesToCache = [
   './',
@@ -8,11 +8,15 @@ var filesToCache = [
   '/img/delete.png',
   '/img/download.png',
   '/img/edit.png',
+  '/img/forward.png',
   '/img/github.png',
   '/img/headphones.png',
   '/img/icon.png',
   '/img/menu.png',
+  '/img/pause.png',
   '/img/plus.png',
+  '/img/play.png',
+  '/img/rewind.png',
   '/img/upload.png'
 ];
 

@@ -88,6 +88,7 @@ $(function () {
 	}
 
     function play(cadena, titleAudio, min, guid) {
+		$("#play").removeClass("play");
         $("#audio").attr("src", cadena);
         $("#audio").attr("autoplay", "");
 		$("#audio")[0].currentTime = min;
@@ -354,13 +355,21 @@ $(function () {
 		if ($('audio')[0].src != '') {
 			if($('audio')[0].paused) {
 				$('audio')[0].play();
-				$("#play").html("Pause");
+				$("#play").removeClass("play");
 			} else {
 				$('audio')[0].pause();
-				$("#play").html("Play");
+				$("#play").addClass("play");
 			}	
 		}
 	});
+	
+	$("#rewind").on("click", function () {
+		$('audio')[0].currentTime = Math.max($('audio')[0].currentTime - 10, 0);
+	});
+	
+	$("#forward").on("click", function () {
+		$('audio')[0].currentTime = Math.min($('audio')[0].currentTime + 10, $('audio')[0].duration);
+	});	
 
 	$("#playLast").on("click", function (x) {
 		play(x.target.dataset.mp3, x.target.dataset.podcast,x.target.dataset.min, '');

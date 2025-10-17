@@ -17,6 +17,12 @@
         #customModal .modal-backdrop {position: absolute;top:0; left:0; right:0; bottom:0;background: rgba(0,0,0,0.5);}
         #customModal .modal-content {position: relative;background: white;padding: 20px;border-radius: 10px;min-width: 300px;z-index: 2100;text-align: center;}        
         body.dark #customModal .modal-content {background: black;}#customModal .modal-buttons {margin-top: 20px;}#customModal button {margin: 0 10px;padding: 5px 15px;}
+        #play,#rewind,#forward{background-color:transparent;background-repeat: no-repeat;background-position:center;    background-size: contain;}
+        #rewind{background-image:url("./img/rewind.png");}
+        #play{background-image:url("./img/pause.png");}
+        #forward{background-image:url("./img/forward.png");}
+        #play.play{background-image:url("./img/play.png");}
+        body.dark #play,body.dark #rewind,body.dark #forward{filter: invert(1);}
 
     </style>
     <script src="js/zepto.min.js"></script>
@@ -78,9 +84,11 @@
         <div class="row" id="main" style="overflow-y: hidden;">
             <div class="col c12">
                 <div id="audioDiv" class="text-center">
-                    <br/>
-                    <button id="play" class="btn btn-sm smooth" style="height: 75px; width: 75px;">Pause</button>
-                    <br/>
+                    <div class="justify-center">
+                    <button id="rewind" class="btn btn-sm smooth" style="height: 50px; width: 50px;margin-right:20px;"></button>
+                    <button id="play" class="btn btn-sm smooth" style="height: 75px; width: 75px;"></button>
+                    <button id="forward" class="btn btn-sm smooth" style="height: 50px; width: 50px;margin-left:20px"></button>
+                    </div>
                     <audio controls id="audio" style="width:100%"></audio>
                 </div>
             </div>
