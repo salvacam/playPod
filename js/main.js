@@ -166,9 +166,9 @@ $(function () {
 					+ "' data-nombre='" + nombrePista + "' data-url='" + dataEpisodios[i].url 
 					+ "' data-guid='" + dataEpisodios[i].guid  +"'> "
 					+ nombrePistaMostrar + "</button></div>"
-					+ " <div><button class='btn btn-sm smooth marcarOido " + escuchado + "' style='padding:5px;'>"
-					+ " <img src='./img/headphones.png' alt='Marcar como oid' width='30'"
-					+ " data-guid='" + dataEpisodios[i].guid  +"'></button> </div></div>");
+					+ " <div><button class='btn btn-sm smooth marcarOido " + escuchado 
+					+ "' data-guid='" + dataEpisodios[i].guid  +"' style='padding:5px;'>"
+					+ " </button> </div></div>");
 			}
 
 
