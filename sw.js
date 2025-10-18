@@ -1,23 +1,23 @@
-var cacheName = 'playPod-v0.1.26';
+var cacheName = 'playPod-v0.1.27';
 
 var filesToCache = [
   './',
   './index.html',
-  '/js/main.js',
-  '/js/zepto.min.js',
-  '/img/delete.png',
-  '/img/download.png',
-  '/img/edit.png',
-  '/img/forward.png',
-  '/img/github.png',
-  '/img/headphones.png',
-  '/img/icon.png',
-  '/img/menu.png',
-  '/img/pause.png',
-  '/img/plus.png',
-  '/img/play.png',
-  '/img/rewind.png',
-  '/img/upload.png'
+  './js/main.js',
+  './js/zepto.min.js',
+  './img/delete.png',
+  './img/download.png',
+  './img/edit.png',
+  './img/forward.png',
+  './img/github.png',
+  './img/headphones.png',
+  './img/icon.png',
+  './img/menu.png',
+  './img/pause.png',
+  './img/plus.png',
+  './img/play.png',
+  './img/rewind.png',
+  './img/upload.png'
 ];
 
 self.addEventListener('install', function(e) {
