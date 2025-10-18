@@ -135,7 +135,7 @@ $(function () {
 	}
 
 	function dibujarEpisodios(dataEpisodios) {
-		if (paginacion == 0) {
+		if (paginacion <= 1) {
 			comprobarOidos = [];
 		}
 		$("#spinnerDiv").addClass("hide");
@@ -146,7 +146,7 @@ $(function () {
 		url:"https://traffic.libsyn.com/fitnessrevolucionario/Episodio457.mp3"
 		*/
 		if (dataEpisodios.length > 0) {  
-			if (paginacion == 0) {
+			if (paginacion <= 1) {
 				localStorage.setItem("_playpod_data", JSON.stringify(dataEpisodios));
 			}
 
@@ -424,5 +424,4 @@ $(function () {
 	    .then(() => console.log('Service Worker registrado'))
 	    .catch(err => console.error('SW fallo:', err));
 	}
-
 });
