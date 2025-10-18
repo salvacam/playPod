@@ -83,6 +83,7 @@ $(function () {
 	        editEpisodio($(this).data("id"));
 	    });
 		$("#listado").text("");
+
 		paginacion = 0;
 	    cargarEpisodios();
 	}
@@ -133,83 +134,97 @@ $(function () {
 	  }
 	}
 
-	function cargarEpisodios() {
-        $("#spinnerDiv").removeClass("hide");
-		const datos = {
-		  pag: paginacion,
-		  prog: episodios 
-		};
-		$.ajax({
-			type: 'POST',
-			url: "https://salvacam.x10.mx/playPod/mix.php",
-			//url: "servidor/mix.php",
-		  	data: { 
-			    pag: paginacion, 
-			    prog: JSON.stringify(episodios)
-			},
-			dataType: 'json',
-			success: function(data) {
-				if (paginacion == 0) {
-					comprobarOidos = [];
-				}
-        		$("#spinnerDiv").addClass("hide");
-				/*
-				duration: "52:29"
-				name:"Radio Fitness"
-				title:"Ayudar Mejor y Peligros de la Empatía, con Pablo Melchor"
-				url:"https://traffic.libsyn.com/fitnessrevolucionario/Episodio457.mp3"
-				*/
-    			if (data.length > 0) {              
-					for (var i = 0; i < data.length; i++) {
+	function dibujarEpisodios(dataEpisodios) {
+		if (paginacion == 0) {
+			comprobarOidos = [];
+		}
+		$("#spinnerDiv").addClass("hide");
+		/*
+		duration: "52:29"
+		name:"Radio Fitness"
+		title:"Ayudar Mejor y Peligros de la Empatía, con Pablo Melchor"
+		url:"https://traffic.libsyn.com/fitnessrevolucionario/Episodio457.mp3"
+		*/
+		if (dataEpisodios.length > 0) {  
+			if (paginacion == 0) {
+				localStorage.setItem("_playpod_data", JSON.stringify(dataEpisodios));
+			}
 
-	                    var nombrePista = data[i].title + " <i>{ " + data[i].name +  " }</i> ";
-	                    var nombrePistaMostrar = data[i].title + " <i>{ " + data[i].name +  " }</i> " + data[i].duration;
-	                    var escuchado = "";
-	                    if (data[i].guid != "") {
-	                    	comprobarOidos.push(data[i].guid);
-							if (escuchados.indexOf(data[i].guid) === -1) {					    		
-	                    		escuchado = "oir";
-							}
-	                    }
-						$("#listado").append("<div class='justify-between'><div style='width:90%'>"
-							+"<button class='btn btn-sm smooth pista " + escuchado + "' data-pista='" + i 
-							+ "' data-nombre='" + nombrePista + "' data-url='" + data[i].url 
-							+ "' data-guid='" + data[i].guid  +"'> "
-							+ nombrePistaMostrar + "</button></div>"
-							+ " <div><button class='btn btn-sm smooth marcarOido " + escuchado + "' style='padding:5px;'>"
-							+ " <img src='./img/headphones.png' alt='Marcar como oid' width='30'"
-							+ " data-guid='" + data[i].guid  +"'></button> </div></div>");
+			for (var i = 0; i < dataEpisodios.length; i++) {
+
+	            var nombrePista = dataEpisodios[i].title + " <i>{ " + dataEpisodios[i].name +  " }</i> ";
+	            var nombrePistaMostrar = dataEpisodios[i].title + " <i>{ " + dataEpisodios[i].name +  " }</i> " + dataEpisodios[i].duration;
+	            var escuchado = "";
+	            if (dataEpisodios[i].guid != "") {
+	            	comprobarOidos.push(dataEpisodios[i].guid);
+					if (escuchados.indexOf(dataEpisodios[i].guid) === -1) {					    		
+	            		escuchado = "oir";
 					}
+	            }
+				$("#listado").append("<div class='justify-between'><div style='width:90%'>"
+					+"<button class='btn btn-sm smooth pista " + escuchado + "' data-pista='" + i 
+					+ "' data-nombre='" + nombrePista + "' data-url='" + dataEpisodios[i].url 
+					+ "' data-guid='" + dataEpisodios[i].guid  +"'> "
+					+ nombrePistaMostrar + "</button></div>"
+					+ " <div><button class='btn btn-sm smooth marcarOido " + escuchado + "' style='padding:5px;'>"
+					+ " <img src='./img/headphones.png' alt='Marcar como oid' width='30'"
+					+ " data-guid='" + dataEpisodios[i].guid  +"'></button> </div></div>");
+			}
 
 
-					$(".marcarOido").on("click", function (x) {
-				    	if (escuchados == null) {
-				    		escuchados = [];    		
-				    	} 	
-						$(x.target).removeClass('oir');
-						$(x.target).parent().removeClass('oir');
-    					$('.pista.oir[data-guid="' + x.target.dataset.guid + '"]').removeClass('oir');
-						if (escuchados.indexOf(x.target.dataset.guid) === -1) {
-    						escuchados.push(x.target.dataset.guid);
-							localStorage.setItem("_playpod_escuchados", JSON.stringify(escuchados));
-						}
-					});
-					
-					$(".pista").on("click", function (x) {
-						$(x.target).removeClass('oir');
-						play(x.target.dataset.url, x.target.dataset.nombre, 0, x.target.dataset.guid);
-					});
-
-					escuchados = escuchados.filter(item => comprobarOidos.includes(item));
+			$(".marcarOido").on("click", function (x) {
+		    	if (escuchados == null) {
+		    		escuchados = [];    		
+		    	} 	
+				$(x.target).removeClass('oir');
+				$(x.target).parent().removeClass('oir');
+				$('.pista.oir[data-guid="' + x.target.dataset.guid + '"]').removeClass('oir');
+				if (escuchados.indexOf(x.target.dataset.guid) === -1) {
+					escuchados.push(x.target.dataset.guid);
 					localStorage.setItem("_playpod_escuchados", JSON.stringify(escuchados));
 				}
-			},
-			error: function(xhr, type) {
-        		$("#spinnerDiv").addClass("hide");
-				$("#listado").append("<h5>No hay audios</h5>");
-			}
-		});
-		paginacion++;
+			});
+			
+			$(".pista").on("click", function (x) {
+				$(x.target).removeClass('oir');
+				play(x.target.dataset.url, x.target.dataset.nombre, 0, x.target.dataset.guid);
+			});
+
+			escuchados = escuchados.filter(item => comprobarOidos.includes(item));
+			localStorage.setItem("_playpod_escuchados", JSON.stringify(escuchados));
+
+			paginacion++;
+		}
+	}
+
+	function cargarEpisodios() {
+        $("#spinnerDiv").removeClass("hide");
+		var datosGuardados = JSON.parse(localStorage.getItem("_playpod_data"));
+		if (paginacion == 0 && datosGuardados != null) {
+			dibujarEpisodios(datosGuardados);
+		} else {
+			$.ajax({
+				type: 'POST',
+				url: "https://salvacam.x10.mx/playPod/mix.php",
+				//url: "servidor/mix.php",
+			  	data: { 
+				    pag: (paginacion - 1), 
+				    prog: JSON.stringify(episodios)
+				},
+				dataType: 'json',
+				success: function(data) {
+					if (paginacion == 1) {
+						$("#listado").text("");
+    					window.scrollTo(0, 0);
+					}
+					dibujarEpisodios(data);
+				},
+				error: function(xhr, type) {
+	        		$("#spinnerDiv").addClass("hide");
+					$("#listado").append("<h5>No hay audios</h5>");
+				}
+			});
+		}
 	}
 
 	function cargarMas() {
