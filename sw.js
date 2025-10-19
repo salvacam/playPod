@@ -1,4 +1,4 @@
-var cacheName = 'playPod-v0.1.30';
+var cacheName = 'playPod-v0.1.31';
 
 var filesToCache = [
   './',
