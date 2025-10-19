@@ -43,6 +43,8 @@ $(function () {
 	    	episodios.splice(id, 1);
 			localStorage.setItem("_playpod_episodios", JSON.stringify(episodios));
 			actualizarProgramas();
+			paginacion = 1;
+	    	cargarEpisodios();
 			$('#config').scrollTop(0);
 		}
     }
@@ -57,6 +59,8 @@ $(function () {
 			episodios[id].name = nombre;
 			localStorage.setItem("_playpod_episodios", JSON.stringify(episodios));
 			actualizarProgramas();
+			paginacion = 1;
+	    	cargarEpisodios();
 			$('#config').scrollTop(0);
     	}
     }
@@ -83,9 +87,6 @@ $(function () {
 	        editEpisodio($(this).data("id"));
 	    });
 		$("#listado").text("");
-
-		paginacion = 0;
-	    cargarEpisodios();
 	}
 
     function play(cadena, titleAudio, min, guid) {
@@ -295,7 +296,7 @@ $(function () {
 		escuchados = [];
 		localStorage.setItem("_playpod_escuchados", JSON.stringify(escuchados));
 		$("#listado").text("");
-		paginacion = 0;
+		paginacion = 1;
 	    cargarEpisodios();
 	});
 
@@ -307,6 +308,8 @@ $(function () {
 				name: $("#otro-name").val()});
 			localStorage.setItem("_playpod_episodios", JSON.stringify(episodios));
 			actualizarProgramas();
+			paginacion = 1;
+	    	cargarEpisodios();
 		}
     });
 
@@ -338,6 +341,8 @@ $(function () {
 					episodios = datos;
 					localStorage.setItem("_playpod_episodios", JSON.stringify(episodios));
 					actualizarProgramas();
+					paginacion = 1;
+	    			cargarEpisodios();
 					$('#config').scrollTop(0);
 				}
 	        } catch(err) {
@@ -418,10 +423,12 @@ $(function () {
     setInterval(myTimer, 30000);
 
 	actualizarProgramas();
-
+	cargarEpisodios();
+	
 	if ('serviceWorker' in navigator) {
 	  navigator.serviceWorker.register('./sw.js')
 	    .then(() => console.log('Service Worker registrado'))
 	    .catch(err => console.error('SW fallo:', err));
 	}
+
 });
