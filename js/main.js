@@ -188,7 +188,15 @@ $(function () {
 			
 			$(".pista").on("click", function (x) {
 				$(x.target).removeClass('oir');
-				play(x.target.dataset.url, x.target.dataset.nombre, 0, x.target.dataset.guid);
+				var url = x.target.dataset.url;
+				var nombre = x.target.dataset.nombre;
+				var guid = x.target.dataset.guid;
+				if (x.target.dataset.url == null) {
+					url  = $(x.target).parent()[0].dataset.url;
+					nombre  = $(x.target).parent()[0].dataset.nombre;
+					guid  = $(x.target).parent()[0].dataset.guid;
+				} 
+				play(url, nombre, 0, guid);
 			});
 
 			escuchados = escuchados.filter(item => comprobarOidos.includes(item));
