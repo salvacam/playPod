@@ -23,6 +23,31 @@
         #forward{background-image:url("./img/forward.png");}
         #play.play{background-image:url("./img/play.png");}
         body.dark #play,body.dark #rewind,body.dark #forward{filter: invert(1);}
+        /* Oculta el botón play/pause en navegadores WebKit/Blink */
+        audio::-webkit-media-controls-play-button,
+        audio::-webkit-media-controls-start-playback-button,
+        audio::-webkit-media-controls-overlay-play-button {
+          display: none !important;
+          -webkit-appearance: none !important;
+          width: 0 !important;
+          height: 0 !important;
+          opacity: 0 !important;
+          pointer-events: none !important;
+        }
+
+        /* Opcional: reducir espacio que dejaba el botón para que la barra no se vea con hueco */
+        audio::-webkit-media-controls-panel {
+          /* ajustar padding si quieres compactar (prueba valores) */
+          padding-left: 6px !important;
+        }
+
+        /* Mantén visibles otros controles (timeline, tiempo, volumen) */
+        audio::-webkit-media-controls-timeline,
+        audio::-webkit-media-controls-current-time-display,
+        audio::-webkit-media-controls-time-remaining-display,
+        audio::-webkit-media-controls-volume-slider {
+          display: block !important;
+        }
 
     </style>
     <script src="js/zepto.min.js"></script>
