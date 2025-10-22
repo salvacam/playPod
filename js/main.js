@@ -31,7 +31,11 @@ $(function () {
 			{
 				url: "https://www.ivoox.com/feed_fg_f1302670_filtro_1.xml",
 				name: "Construye tu Físico"
-			}
+			},
+			{
+				url: "https://www.danielprimo.io/podcast/feed.xml",
+				name: "Web Reactiva"
+			}			
 		];
 	}
 	var paginacion = 0;
@@ -432,7 +436,17 @@ $(function () {
 
 	actualizarProgramas();
 	cargarEpisodios();
-	
+
+	navigator.mediaSession.setActionHandler('play', () => {
+    	//console.log('▶️ Play pulsado desde notificación');
+		$("#play").removeClass("play");
+  	});
+
+	navigator.mediaSession.setActionHandler('pause', () => {
+		//console.log('⏸️ Pause pulsado desde notificación');
+		$("#play").addClass("play");
+	});
+
 	if ('serviceWorker' in navigator) {
 	  navigator.serviceWorker.register('./sw.js')
 	    .then(() => console.log('Service Worker registrado'))
