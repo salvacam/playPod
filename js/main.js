@@ -439,11 +439,13 @@ $(function () {
 
 	navigator.mediaSession.setActionHandler('play', () => {
     	//console.log('▶️ Play pulsado desde notificación');
+		$('audio')[0].play();
 		$("#play").removeClass("play");
   	});
 
 	navigator.mediaSession.setActionHandler('pause', () => {
 		//console.log('⏸️ Pause pulsado desde notificación');
+		$('audio')[0].pause();
 		$("#play").addClass("play");
 	});
 
