@@ -377,7 +377,7 @@ $(function () {
 		var url = URL.createObjectURL(blob);
 		var a = $('<a>')
 		  .attr('href', url)
-		  .attr('download', 'plapPod.json')  
+		  .attr('download', 'playPod.json')  
 		  .appendTo('body');
 
 		a[0].click(); 
