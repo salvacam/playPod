@@ -44,15 +44,18 @@ $(function () {
 
 	var isLoading = 0;
 
-    function deleteEpisodio(id) {    	
-	    if (customConfirm("¿Estás seguro de que eliminar el episodio?")) {
-	    	episodios.splice(id, 1);
-			localStorage.setItem("_playpod_episodios", JSON.stringify(episodios));
-			actualizarProgramas();
-			paginacion = 1;
-	    	cargarEpisodios();
-			$('#config').scrollTop(0);
-		}
+    function deleteEpisodio(id) {
+	    customConfirm("¿Estás seguro de eliminar el episodio?")
+	        .then(function(ok) {
+	            if (ok) {
+			    	episodios.splice(id, 1);
+					localStorage.setItem("_playpod_episodios", JSON.stringify(episodios));
+					actualizarProgramas();
+					paginacion = 1;
+			    	cargarEpisodios();
+					$('#config').scrollTop(0);
+	            }
+	        });
     }
 
     function editEpisodio(id) {
@@ -262,7 +265,7 @@ $(function () {
 	        });
 	    });
 	}
-	
+
 	function customConfirm(message) {
 	    return new Promise(function(resolve) {
 	        $('#modalMessage').text(message);
@@ -351,14 +354,17 @@ $(function () {
 	                throw new Error("Cada elemento debe ser un objeto con 'url' y 'name'");
 	            }
     
-			    if (customConfirm("¿Estás seguro de que guardar la lista subida?")) {			     
-					episodios = datos;
-					localStorage.setItem("_playpod_episodios", JSON.stringify(episodios));
-					actualizarProgramas();
-					paginacion = 1;
-	    			cargarEpisodios();
-					$('#config').scrollTop(0);
-				}
+				customConfirm("¿Estás seguro de guardar la lista subida?")
+			        .then(function(ok) {
+			            if (ok) {
+			                episodios = datos;
+							localStorage.setItem("_playpod_episodios", JSON.stringify(episodios));
+							actualizarProgramas();
+							paginacion = 1;
+			    			cargarEpisodios();
+							$('#config').scrollTop(0);
+			            }
+			        });
 	        } catch(err) {
 	            customAlert("Archivo JSON inválido: " + err.message);
 	        }
@@ -427,20 +433,25 @@ $(function () {
 
 	    // Si se han hecho 5 clics seguidos
 	    if (clickCount >= 5) {
-	        clickCount = 0; // reiniciar contador	         	
-		    if (customConfirm("¿Estás seguro de que eliminar la cache?")) {		    	
-				$.ajax({
-					type: 'GET',
-					url: "https://salvacam.x10.mx/playPod/clear_cache.php",
-					//url: "servidor/mix.php",
-					dataType: 'json',
-					success: function(data) {
-					},
-					error: function(xhr, type) {
-		            	console.log("Error al borrar la caché");
-					}
-				});
-			}
+	        clickCount = 0; // reiniciar contador
+		    customConfirm("¿Estás seguro de eliminar la cache?")
+		        .then(function(ok) {
+		            if (ok) {
+		            	$.ajax({
+							type: 'GET',
+							url: "https://salvacam.x10.mx/playPod/clear_cache.php",
+							//url: "servidor/mix.php",
+							dataType: 'json',
+							success: function(data) {
+							},
+							error: function(xhr, type) {
+				            	console.log("Error al borrar la caché");
+							}
+						});
+		            } else {
+		                console.log('El usuario canceló');
+		            }
+		        });
 	    }
 	});
 
