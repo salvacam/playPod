@@ -427,18 +427,20 @@ $(function () {
 
 	    // Si se han hecho 5 clics seguidos
 	    if (clickCount >= 5) {
-	        clickCount = 0; // reiniciar contador
-			$.ajax({
-				type: 'GET',
-				url: "https://salvacam.x10.mx/playPod/clear_cache.php",
-				//url: "servidor/mix.php",
-				dataType: 'json',
-				success: function(data) {
-				},
-				error: function(xhr, type) {
-	            	console.log("Error al borrar la caché");
-				}
-			});
+	        clickCount = 0; // reiniciar contador	         	
+		    if (customConfirm("¿Estás seguro de que eliminar la cache?")) {		    	
+				$.ajax({
+					type: 'GET',
+					url: "https://salvacam.x10.mx/playPod/clear_cache.php",
+					//url: "servidor/mix.php",
+					dataType: 'json',
+					success: function(data) {
+					},
+					error: function(xhr, type) {
+		            	console.log("Error al borrar la caché");
+					}
+				});
+			}
 	    }
 	});
 
