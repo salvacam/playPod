@@ -1,4 +1,6 @@
 $(function () {
+	var clickCount = 0;
+	var clickTimer = null;
 
 	var episodios =  JSON.parse(localStorage.getItem("_playpod_episodios"));
 	var escuchados =  JSON.parse(localStorage.getItem("_playpod_escuchados"));
@@ -413,6 +415,31 @@ $(function () {
 		escuchados = comprobarOidos;
 		localStorage.setItem("_playpod_escuchados", JSON.stringify(escuchados));		
 		$('.oir').removeClass('oir');
+	});
+
+
+	$("#tituloApp").on("click", function() {
+	    clickCount++;
+
+	    // Reinicia el contador si pasan más de 1.5s entre clics
+	    clearTimeout(clickTimer);
+	    clickTimer = setTimeout(() => clickCount = 0, 1500);
+
+	    // Si se han hecho 5 clics seguidos
+	    if (clickCount >= 5) {
+	        clickCount = 0; // reiniciar contador
+			$.ajax({
+				type: 'GET',
+				url: "https://salvacam.x10.mx/playPod/clear_cache.php",
+				//url: "servidor/mix.php",
+				dataType: 'json',
+				success: function(data) {
+				},
+				error: function(xhr, type) {
+	            	console.log("Error al borrar la caché");
+				}
+			});
+	    }
 	});
 
 	window.addEventListener('online', actualizarAvisoConexion);
