@@ -163,6 +163,7 @@ $(function () {
 			for (var i = 0; i < dataEpisodios.length; i++) {
 
 	            var nombrePista = dataEpisodios[i].title + " <i>{ " + dataEpisodios[i].name +  " }</i> ";
+	            nombrePista = nombrePista.replace(/'/g, "&#39;").replace(/"/g, "&quot;");
 	            var nombrePistaMostrar = dataEpisodios[i].title + " <i>{ " + dataEpisodios[i].name +  " }</i> " + dataEpisodios[i].duration;
 	            var escuchado = "";
 	            if (dataEpisodios[i].guid != "") {
