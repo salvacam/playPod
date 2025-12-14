@@ -10,10 +10,12 @@ $(function () {
 	var comprobarOidos = [];
 	if (episodios == null){
 		episodios = [ 
+			/*
 			{
 				url: "https://api.rtve.es/api/programas/46690/audios.rss",
 				name: "Fallo de sistema"
 			},
+			*/
 			{
 				url: "https://rigorycriterio.es/feeds/audio_teleindiscretos.rss.xml",
 				name: "Teleindiscretos"
