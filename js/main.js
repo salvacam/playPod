@@ -302,6 +302,44 @@ $(function () {
 	  }
 	});
 
+	const audioPlayer = document.getElementById('audio');
+	const progressBar = document.getElementById('progress-bar');
+	const timeDisplay = document.getElementById('time-display');
+	const timeDisplayCurrent = document.getElementById('time-display-current');
+
+	audioPlayer.addEventListener('timeupdate', () => {
+	    const currentTime = audioPlayer.currentTime;
+	    const duration = audioPlayer.duration;
+
+	    // Actualizar la barra de progreso (valor entre 0 y 100)
+	    if (!isNaN(duration)) {
+	        const progress = (currentTime / duration) * 100;
+	        progressBar.value = progress;
+	    	timeDisplayCurrent.textContent = `${formatTime(currentTime)}`;
+	    }
+	});
+
+	// Permitir al usuario buscar en el audio haciendo clic en la barra de progreso
+	progressBar.addEventListener('input', () => {
+	    const duration = audioPlayer.duration;
+	    if (!isNaN(duration)) {
+	        const newTime = (progressBar.value / 100) * duration;
+	        audioPlayer.currentTime = newTime;
+	    }
+	});
+
+	// Función de utilidad para formatear el tiempo (ej. 1:30)
+	function formatTime(seconds) {
+	    const minutes = Math.floor(seconds / 60);
+	    const secs = Math.floor(seconds % 60);
+	    return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+	}
+
+	// Inicializar la visualización de la duración una vez que los metadatos se cargan
+	audioPlayer.addEventListener('loadedmetadata', () => {
+	    timeDisplay.textContent = `${formatTime(audioPlayer.duration)}`;
+	});
+
     $('#configToggle').on('click', function() {
         $('#config').toggleClass('show');
     	$('body').toggleClass('noscroll');
