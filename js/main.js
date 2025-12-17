@@ -350,6 +350,12 @@ $(function () {
         localStorage.setItem("_playpod_dark", $('#darkMode').is(':checked'));
 	});
 
+	$("#playerAudio").on("change", function () {
+		$("audio").toggleClass("hide");
+		$("#newPlayerAudio").toggleClass("hide");
+        localStorage.setItem("_playpod_playerAudio", $('#playerAudio').is(':checked'));
+	});
+
 	$("#resetOidos").on("click", function () {
 		escuchados = [];
 		localStorage.setItem("_playpod_escuchados", JSON.stringify(escuchados));
@@ -504,11 +510,18 @@ $(function () {
     $("#playLast")[0].dataset.podcast = localStorage.getItem("_playpod_title");
 	$("#lastTime").html(parseInt(localStorage.getItem("_playpod_time")/60));
 	$("#playLast")[0].dataset.min = localStorage.getItem("_playpod_time");
-	
+
 	var darkMode = localStorage.getItem("_playpod_dark");
 	if (darkMode != null && darkMode == "true") {
 		$('#darkMode').prop('checked', true);		
 		$("body").toggleClass("dark");
+	}
+	
+	var playerAudio = localStorage.getItem("_playpod_playerAudio");
+	if (playerAudio != null && playerAudio == "true") {		
+		$('#playerAudio').prop('checked', true);
+		$("audio").toggleClass("hide");
+		$("#newPlayerAudio").toggleClass("hide");
 	}
 
 	actualizarAvisoConexion();

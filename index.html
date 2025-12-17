@@ -49,9 +49,6 @@
           display: block !important;
         }
 
-        audio {
-          display: none;
-        }
         .player-container {
             width: 300px;
             padding: 10px;
@@ -94,16 +91,24 @@
     <div class="container" id="container">        
         
         <div class="row" id="config">
-            <div id="" class="text-center col c6" style="margin-top: 10px;">
+            <div id="" class="text-center col c12" style="margin-top: 10px;">
                 <label class="checkbox">Modo oscuro
                   <input type="checkbox" name="darkMode" id="darkMode">
                   <span class="checkmark"></span>
                 </label>
             </div>
 
-            <div id="" class="text-center col c6" style="margin-top: 10px;">
+            <div id="" class="text-center col c12" style="margin-top: 10px;">
+                <label class="checkbox">Reproductor nativo
+                  <input type="checkbox" name="playerAudio" id="playerAudio">
+                  <span class="checkmark"></span>
+                </label>
+            </div>
+
+            <div id="" class="text-center col c12" style="margin-top: 10px;">
                 <button id="resetOidos" class="btn btn-sm smooth" style="padding:10px; font-size:18px;">Resetear oidos</button>
             </div>
+
                 <br>
 
             <div id="" class="col c12">
@@ -141,12 +146,12 @@
                     <button id="play" class="btn btn-sm smooth" style="height: 75px; width: 75px;"></button>
                     <button id="forward" class="btn btn-sm smooth" style="height: 50px; width: 50px;margin-left:50px"></button>
                     </div>
-                <div class="controls">
+                <div id="newPlayerAudio" class="controls">
                     <span id="time-display-current">0:00</span>
                     <input type="range" id="progress-bar" min="0" max="100" value="0">
                     <span id="time-display">0:00</span>
                 </div>
-                    <audio controls id="audio" style="width:100%;margin-top:10px;"></audio>
+                    <audio controls id="audio" class="hide" style="width:100%;margin-top:10px;"></audio>
                 </div>
             </div>
 
