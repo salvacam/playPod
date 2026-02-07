@@ -17,8 +17,8 @@ $(function () {
 			},
 			*/
 			{
-				url: "https://rigorycriterio.es/feeds/audio_teleindiscretos.rss.xml",
-				name: "Teleindiscretos"
+				url: "https://rigorycriterio.es/feeds/audio.rss.xml",
+				name: "A.C.H.U.S."
 			},
 			{
 				url: "https://msdos.club/podfeed/feed.xml",
