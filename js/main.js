@@ -15,10 +15,14 @@ $(function () {
 				url: "https://api.rtve.es/api/programas/46690/audios.rss",
 				name: "Fallo de sistema"
 			},
-			*/
 			{
 				url: "https://rigorycriterio.es/feeds/audio.rss.xml",
 				name: "A.C.H.U.S."
+			},
+			*/
+			{
+				url: "https://rigorycriterio.es/feeds/audio_teleindiscretos.rss.xml",
+				name: "Teleindiscretos"
 			},
 			{
 				url: "https://msdos.club/podfeed/feed.xml",
